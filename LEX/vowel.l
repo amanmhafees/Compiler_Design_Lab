@@ -1,6 +1,6 @@
-/*amanmhafeeswork@cloudshell:~ (cogent-genre-456103-i0)$ flex vowel.l*/
-/*amanmhafeeswork@cloudshell:~ (cogent-genre-456103-i0)$ gcc lex.yy.c*/
-/*amanmhafeeswork@cloudshell:~ (cogent-genre-456103-i0)$ ./a.out*/
+/*flex vowel.l*/
+/* gcc lex.yy.c*/
+/* ./a.out*/
 /*Enter a string and press Ctrl+D when done:*/
 /*aman*/
 /*Vowels: 2*/
