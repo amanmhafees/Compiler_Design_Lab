@@ -1,72 +1,79 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
-#define MAX_STATES 50
+#define MAX_STATES 20
+#define MAX_TRANSITIONS 50
 
-int eps[MAX_STATES][MAX_STATES];
+struct transition {
+    int from;
+    char input;
+    int to;
+};
 
-// helper to parse "q<number>"
-static int parse_state(const char* tok) {
-	int idx = -1;
-	if (sscanf(tok, "q%d", &idx) == 1) return idx;
-	if (sscanf(tok, "Q%d", &idx) == 1) return idx;
-	return -1;
+struct transition transitions[MAX_TRANSITIONS];
+int num_transitions = 0;
+int closure[MAX_STATES];
+int closure_count = 0;
+
+int in_closure(int state) {
+    for (int i = 0; i < closure_count; i++) {
+        if (closure[i] == state)
+            return 1;
+    }
+    return 0;
 }
 
-void dfs(int n, int u, int vis[]) {
-	int v;
-	for (v = 0; v < n; v++) {
-		if (eps[u][v] && !vis[v]) {
-			vis[v] = 1;
-			dfs(n, v, vis);
-		}
-	}
+void find_epsilon_closure(int state) {
+    if (!in_closure(state))
+        closure[closure_count++] = state;
+
+    for (int i = 0; i < num_transitions; i++) {
+        if (transitions[i].from == state &&
+            transitions[i].input == 'e' &&
+            !in_closure(transitions[i].to)) {
+            find_epsilon_closure(transitions[i].to);
+        }
+    }
 }
 
 int main() {
-	// clear eps
-	for (int i = 0; i < MAX_STATES; i++)
-		for (int j = 0; j < MAX_STATES; j++)
-			eps[i][j] = 0;
+    printf("Enter the number of transitions: ");
+    scanf("%d", &num_transitions);
 
-	int m;
-	printf("Enter number of transitions: ");
-	if (scanf("%d", &m) != 1 || m < 0) return 0;
+    printf("\nEnter the transitions in the format (e.g., q0 0 q1 or q0 e q2):\n");
+    for (int i = 0; i < num_transitions; i++) {
+        printf("Transition %d:\n", i + 1);
+        printf("From state: ");
+        scanf("%d", &transitions[i].from);
+        printf("Input: ");
+        scanf(" %c", &transitions[i].input);
+        printf("To state: ");
+        scanf("%d", &transitions[i].to);
+    }
 
-	char a[32], b[32], c[32];
-	int max_state = -1;
+    // Print all transitions
+    printf("\n--- Transitions ---\n");
+    for (int i = 0; i < num_transitions; i++) {
+        printf("q%d --%c--> q%d\n", transitions[i].from, transitions[i].input, transitions[i].to);
+    }
 
-	printf("Enter each transition as: qX sym qY (e.g., q0 0 q0 or q0 e q1)\n");
-	for (int i = 0; i < m; i++) {
-		if (scanf("%31s %31s %31s", a, b, c) != 3) continue;
-		int from = parse_state(a);
-		int to   = parse_state(c);
-		if (from < 0 || to < 0 || from >= MAX_STATES || to >= MAX_STATES) continue;
-		if (b[0] == 'e' || b[0] == 'E') eps[from][to] = 1;
-		if (from > max_state) max_state = from;
-		if (to > max_state) max_state = to;
-	}
+    // Find all unique states
+    int max_state = 0;
+    for (int i = 0; i < num_transitions; i++) {
+        if (transitions[i].from > max_state) max_state = transitions[i].from;
+        if (transitions[i].to > max_state) max_state = transitions[i].to;
+    }
 
-	if (max_state < 0) return 0;
+    printf("\n--- Epsilon Closures ---\n");
+    for (int s = 0; s <= max_state; s++) {
+        closure_count = 0;
+        find_epsilon_closure(s);
+        printf("ε-closure(q%d): { ", s);
+        for (int i = 0; i < closure_count; i++) {
+            printf("q%d ", closure[i]);
+        }
+        printf("}\n");
+    }
 
-	int n = max_state + 1;
-	int vis[MAX_STATES];
-
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) vis[j] = 0;
-		vis[i] = 1;
-		dfs(n, i, vis);
-
-		printf("E-closure(q%d) = {", i);
-		int first = 1;
-		for (int j = 0; j < n; j++) {
-			if (vis[j]) {
-				if (!first) printf(", ");
-				printf("q%d", j);
-				first = 0;
-			}
-		}
-		printf("}\n");
-	}
-	return 0;
+    return 0;
 }
