@@ -1,3 +1,5 @@
+
+
 %{
     #include<stdio.h>
     extern FILE *yyin;
@@ -24,3 +26,22 @@ int main(){
 int yywrap(){
     return 1;
 }
+
+/* Sample input.txt content: */
+/* int a = 10; */
+/* float b = 3.5; */
+/* char c = 'x'; */
+
+/* if (a < b) { */
+/*     a = a + 1; */
+/* } else { */
+/*     b = b - 2; */
+/* } */
+
+/* for (int i = 0; i < 5; i++) { */
+/*     a = a * 2; */
+/* } */
+
+/* while (a > 0) { */
+/*     a = a - 1; */
+/* } */
