@@ -1,0 +1,13 @@
+// This is a single-line comment
+int main() {
+    int a = 10; // another single-line comment
+    /* This is a 
+       multi-line comment */
+    printf("Hello World"); /* inline multi-line comment */
+    // yet another single-line
+    return 0;
+}
+
+/*
+    One more multi-line comment
+*/
