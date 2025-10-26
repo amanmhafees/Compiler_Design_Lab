@@ -8,7 +8,7 @@
 %}
 
 %%
-[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4} {
+[a-zA-Z0-9._]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4} {
     yylval.str = strdup(yytext);
     return VALID_EMAIL;
 }
