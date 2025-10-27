@@ -5,7 +5,7 @@
 %}
 
 %%
-[0-9]+                    { yylval = atoi(yytext); return DIGIT; }
+[0-9]+                    { yylval.num = atoi(yytext); return DIGIT; }
 [_a-zA-Z][_a-zA-Z0-9]*    { return LETTER; }
 
 "+"    { return '+'; }

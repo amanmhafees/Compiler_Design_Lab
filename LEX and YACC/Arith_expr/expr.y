@@ -4,8 +4,12 @@
     void yyerror(char *s);
     int yylex(void);
 %}
+%union{
+    int num
+}
 
-%token DIGIT LETTER
+%token <num> DIGIT 
+%token LETTER
 %left '+' '-'
 %left '*' '/'
 %right UMINUS
