@@ -1,40 +1,41 @@
 %{
 #include<stdio.h>
 #include<stdlib.h>
-int yylex(void);
-int yyerror(char *s);
-%}
 
+int yylex();
+void yyerror(char*s);
+%}
 %token NUMBER
 %left '+' '-'
 %left '*' '/'
+%left '(' ')' 
 
 %%
 calc:
     expr '\n'{printf("Result=%d\n",$1);}
     ;
+
 expr:
     NUMBER {$$=$1;}
-    | expr '+' expr {$$=$1+$3;}
-    | expr '-' expr {$$=$1-$3;}
-    | expr '*' expr {$$=$1*$3;}
-    | expr '/' expr {
-                if($3==0){
-                    yyerror("Divisionby zero");
+    |expr '+' expr {$$=$1+$3;}
+    |expr '-' expr {$$=$1-$3;}
+    |expr '*' expr {$$=$1*$3;}
+    |expr '/' expr {if($3==0){
+                    yyerror("Division by zero\n");
                     $$=0;
-                }
-                else{
-                    $$=$1/$3;
-                }
-            }
+                    }else{
+                        $$=$1/$3;
+                    }
+    }
+    | '(' expr ')'       { $$ = $2; }
     ;
 %%
-int yyerror(char *msg) {
- printf("Error: %s\n", msg);
- return 0;
- }
- int main() {
- printf("Enter an expression (with +,-, *, /):\n");
- yyparse();
- return 0;
- }
+int main() {
+    printf("Enter the expression:\n");
+    yyparse();
+    return 0;
+}
+
+void yyerror(char *s) {
+    printf("Error: %s\n", s);
+}
