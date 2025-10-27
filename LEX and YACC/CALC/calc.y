@@ -1,35 +1,46 @@
 %{
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int yylex();
-void yyerror(char*s);
+void yyerror(char *s);
 %}
-%token NUMBER
+
+%union {
+    int num;
+}
+
+%token <num> NUMBER
+%type  <num> expr
+
 %left '+' '-'
 %left '*' '/'
-%left '(' ')' 
+%left '(' ')'
 
 %%
+
 calc:
-    expr '\n'{printf("Result=%d\n",$1);}
+    expr '\n' { printf("Result = %d\n", $1); }
     ;
 
 expr:
-    NUMBER {$$=$1;}
-    |expr '+' expr {$$=$1+$3;}
-    |expr '-' expr {$$=$1-$3;}
-    |expr '*' expr {$$=$1*$3;}
-    |expr '/' expr {if($3==0){
-                    yyerror("Division by zero\n");
-                    $$=0;
-                    }else{
-                        $$=$1/$3;
-                    }
-    }
-    | '(' expr ')'       { $$ = $2; }
+      NUMBER          { $$ = $1; }
+    | expr '+' expr   { $$ = $1 + $3; }
+    | expr '-' expr   { $$ = $1 - $3; }
+    | expr '*' expr   { $$ = $1 * $3; }
+    | expr '/' expr   {
+        if ($3 == 0) {
+            yyerror("Division by zero");
+            $$ = 0;
+        } else {
+            $$ = $1 / $3;
+        }
+      }
+    | '(' expr ')'    { $$ = $2; }
     ;
+
 %%
+
 int main() {
     printf("Enter the expression:\n");
     yyparse();
