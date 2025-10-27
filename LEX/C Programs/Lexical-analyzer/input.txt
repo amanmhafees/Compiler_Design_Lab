@@ -1,0 +1,6 @@
+int main() {
+    int a = 10;
+    float b = 2.5;
+    if (a > b)
+        printf("A is greater");
+}
