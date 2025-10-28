@@ -69,42 +69,54 @@ void computeFirst(char symbol, char *result) {
 
 void computeFollow(char symbol, char *result) {
     if (symbol == nonTerminals[0])
-        addToSet(result, '$');  // Rule 1: Start symbol gets $
+        addToSet(result, '$'); // Start symbol gets $
 
     for (int i = 0; i < production_count; i++) {
+        char head = production[i][0]; // A in A->α
+
         for (int j = 3; production[i][j] != '\0'; j++) {
             if (production[i][j] == symbol) {
-                char next = production[i][j + 1];
+                int k = j + 1;
+                int epsilon_chain = 1;
 
-                if (next != '\0') {
+                // Process all symbols after this occurrence of 'symbol'
+                while (production[i][k] != '\0' && epsilon_chain) {
                     char temp[20] = "";
-                    computeFirst(next, temp);
+                    computeFirst(production[i][k], temp);
 
-                    // Add FIRST(next) except epsilon
-                    for (int k = 0; temp[k] != '\0'; k++)
-                        if (temp[k] != 'e')
-                            addToSet(result, temp[k]);
+                    epsilon_chain = 0;
 
-                    // If epsilon in FIRST(next), add FOLLOW(A)
-                    if (strchr(temp, 'e')) {
-                        char tempF[20] = "";
-                        computeFollow(production[i][0], tempF);
-                        for (int k = 0; tempF[k] != '\0'; k++)
-                            addToSet(result, tempF[k]);
+                    // Add FIRST(next symbol) except epsilon
+                    for (int t = 0; temp[t] != '\0'; t++) {
+                        if (temp[t] != 'e')
+                            addToSet(result, temp[t]);
                     }
-                } else {
-                    // If symbol is last, add FOLLOW(A)
-                    if (symbol != production[i][0]) {
-                        char tempF[20] = "";
-                        computeFollow(production[i][0], tempF);
-                        for (int k = 0; tempF[k] != '\0'; k++)
-                            addToSet(result, tempF[k]);
+
+                    // If epsilon in FIRST(next symbol), continue further
+                    if (strchr(temp, 'e')){
+                        epsilon_chain = 1;
+                        k++;
                     }
+
+                    //else
+                      //  epsilon_chain = 0;
+
+
+                }
+
+                // If end of RHS or all following can derive ε
+                if (production[i][k] == '\0' && symbol != head) {
+                    char tempF[20] = "";
+                    computeFollow(head, tempF);
+                    for (int t = 0; tempF[t] != '\0'; t++)
+                        addToSet(result, tempF[t]);
                 }
             }
         }
     }
 }
+
+
 
 void computeFirstFollow() {
     for (int i = 0; i < ntCount; i++) {
